@@ -10,11 +10,12 @@ export async function POST(request: Request) {
 
   const prompt = `
     以下の条件で、近場の穴場スポットと簡単なプランを提案してください。
+    提案内容はmarkdown形式で記述してください。
 
     距離: ${data.distance}
     時間: ${data.time}
     移動手段: ${data.transport}
-    スポットの種類: ${data.spotType}
+    スポットの種類: ${data.spotType || "特になし"}
     過ごし方: ${data.mood}
   `;
 

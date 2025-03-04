@@ -2,6 +2,7 @@
 
 import InputForm from '@/components/organisms/InputForm';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export default function Home() {
   const [plan, setPlan] = useState<any>(null);
@@ -20,7 +21,7 @@ export default function Home() {
 
       if (response.ok) {
         const data = await response.json();
-        setPlan(data.plan);
+        setPlan(data);
       } else {
         console.error('Error:', response.status);
       }
@@ -36,10 +37,10 @@ export default function Home() {
       <h1 className="text-4xl font-bold mb-4">Random Trip Planner</h1>
       <InputForm onSubmit={handlePlanSubmit} isLoading={isLoading} />
       {isLoading && <p>プランを作成中です...</p>}
-      {plan && (
+      {plan && plan.candidates && plan.candidates[0] && plan.candidates[0].content && plan.candidates[0].content.parts && plan.candidates[0].content.parts[0].text && (
         <div className="mt-8 p-4 border rounded-md">
           <h2 className="text-2xl font-bold mb-2">提案プラン</h2>
-          <p>{plan.candidates[0].content.parts[0].text}</p>
+          <ReactMarkdown>{plan.candidates[0].content.parts[0].text}</ReactMarkdown>
         </div>
       )}
     </div>

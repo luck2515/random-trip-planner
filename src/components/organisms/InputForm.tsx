@@ -1,53 +1,75 @@
 "use client";
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import LabeledInput from '@/components/molecules/LabeledInput';
 import LabeledSelect from '@/components/molecules/LabeledSelect';
-import CheckboxGroup from '@/components/molecules/CheckboxGroup';
 import Button from '@/components/atoms/Button';
 
+/**
+ * 入力フォームのProps
+ */
 interface InputFormProps {
+  /**
+   * フォーム送信時の処理
+   */
   onSubmit: (formData: any) => Promise<void>;
+  /**
+   * ローディング状態
+   */
   isLoading: boolean;
 }
 
+/**
+ * フォームのスキーマ
+ */
 const schema = z.object({
   departure: z.string().min(1, { message: "出発地点を入力してください" }),
   distance: z.string().optional(),
   time: z.string().optional(),
   transport: z.string().optional(),
   spotType: z.string().optional(),
-  mood: z.string().optional(),
-}).refine(data => data.distance !== '' || data.time !== '', {
-  message: '距離または時間のどちらかを入力してください',
-  path: ['distance'],
+  mood: z.array(z.string()).min(1, { message: "過ごし方を選択してください" }),
 });
 
+type FormData = z.infer<typeof schema>;
+
+/**
+ * 入力フォームコンポーネント
+ */
 const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof schema>>({
+  /**
+   * react-hook-formのuseForm
+   */
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
-  const onSubmitHandler = async (data: z.infer<typeof schema>) => {
-    onSubmit(data);
+  /**
+   * フォーム送信時の処理
+   * @param data フォームの入力値
+   */
+  const onSubmitHandler = async (data: FormData) => {
+    try {
+      onSubmit(data);
+    } catch (error) {
+      console.error("フォーム送信エラー:", error);
+    }
   };
-
-  const moodOptions = ['のんびり', 'アクティブ', '癒し', '観光', 'グルメ', 'ショッピング', '温泉', '自然', '歴史', 'アート'];
 
   return (
     <form className="flex flex-col gap-4 w-full max-w-md" onSubmit={handleSubmit(onSubmitHandler)}>
-      <LabeledInput label="出発地点" register={register('departure')} errors={errors.departure} />
-      <LabeledSelect label="距離" register={register('distance')}>
+      <LabeledInput label="出発地点" register={register('departure')} errors={errors.departure?.message} />
+      <LabeledSelect label="距離" register={register('distance')} errors={errors.distance?.message}>
         <option value="">選択してください</option>
         <option value="5">5km以内</option>
         <option value="10">10km以内</option>
         <option value="20">20km以内</option>
       </LabeledSelect>
 
-      <LabeledSelect label="時間" register={register('time')}>
+      <LabeledSelect label="時間" register={register('time')} errors={errors.time?.message}>
         <option value="">選択してください</option>
         <option value="30">30分以内</option>
         <option value="60">1時間以内</option>
@@ -64,8 +86,9 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
         <option value="車">車</option>
       </LabeledSelect>
 
-      <LabeledInput label="スポットの種類" register={register('spotType')} />
-      <LabeledSelect label="過ごし方" register={register('mood')}>
+      <LabeledInput label="スポットの種類" register={register('spotType')}  />
+
+      <LabeledSelect label="過ごし方" register={register('mood')} errors={errors.mood?.message}>
         <option value="">選択してください</option>
         <option value="のんびり">のんびり</option>
         <option value="アクティブ">アクティブ</option>
