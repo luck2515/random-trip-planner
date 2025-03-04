@@ -8,9 +8,6 @@ import LabeledInput from '@/components/molecules/LabeledInput';
 import LabeledSelect from '@/components/molecules/LabeledSelect';
 import Button from '@/components/atoms/Button';
 
-/**
- * 入力フォームのProps
- */
 interface InputFormProps {
   /**
    * フォーム送信時の処理
@@ -27,11 +24,10 @@ interface InputFormProps {
  */
 const schema = z.object({
   departure: z.string().min(1, { message: "出発地点を入力してください" }),
-  distance: z.string().optional(),
   time: z.string().optional(),
   transport: z.string().optional(),
-  spotType: z.string().optional(),
-  mood: z.array(z.string()).min(1, { message: "過ごし方を選択してください" }),
+  mood: z.string().optional(),
+  customTime: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -62,12 +58,6 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
   return (
     <form className="flex flex-col gap-4 w-full max-w-md" onSubmit={handleSubmit(onSubmitHandler)}>
       <LabeledInput label="出発地点" register={register('departure')} errors={errors.departure?.message} />
-      <LabeledSelect label="距離" register={register('distance')} errors={errors.distance?.message}>
-        <option value="">選択してください</option>
-        <option value="5">5km以内</option>
-        <option value="10">10km以内</option>
-        <option value="20">20km以内</option>
-      </LabeledSelect>
 
       <LabeledSelect label="時間" register={register('time')} errors={errors.time?.message}>
         <option value="">選択してください</option>
@@ -76,8 +66,11 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
         <option value="180">3時間以内</option>
         <option value="480">半日</option>
         <option value="1440">終日</option>
+        <option value="custom">自由入力</option>
       </LabeledSelect>
-
+      {watch('time') === 'custom' && (
+        <LabeledInput label="時間（分）" register={register('customTime')}  />
+      )}
       <LabeledSelect label="移動手段" register={register('transport')}>
         <option value="徒歩">徒歩</option>
         <option value="自転車">自転車</option>
@@ -86,9 +79,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
         <option value="車">車</option>
       </LabeledSelect>
 
-      <LabeledInput label="スポットの種類" register={register('spotType')}  />
-
-      <LabeledSelect label="過ごし方" register={register('mood')} errors={errors.mood?.message}>
+      <LabeledSelect label="過ごし方" register={register('mood')}>
         <option value="">選択してください</option>
         <option value="のんびり">のんびり</option>
         <option value="アクティブ">アクティブ</option>
@@ -102,7 +93,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
         <option value="アート">アート</option>
       </LabeledSelect>
 
-      <Button disabled={isLoading}>プランを提案</Button>
+      <Button disabled={isLoading} className="disabled:opacity-50 disabled:cursor-not-allowed">プランを提案</Button>
     </form>
   );
 };

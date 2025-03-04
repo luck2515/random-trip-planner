@@ -9,15 +9,19 @@ export async function POST(request: Request) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
 
   const prompt = `
-    以下の条件で、近場の穴場スポットと簡単なプランを提案してください。
+    以下の条件で、${data.departure}から行ける穴場スポットと簡単なプランを提案してください。
     提案内容はmarkdown形式で記述してください。
 
-    距離: ${data.distance}
     時間: ${data.time}
     移動手段: ${data.transport}
-    スポットの種類: ${data.spotType || "特になし"}
-    過ごし方: ${data.mood}
+    過ごし方: ${data.mood || "特になし"}
+
+    ${data.time === 'custom' ? `時間: ${data.customTime}分` : `時間: ${data.time}`}
   `;
+
+  if (!data.departure) {
+    return NextResponse.json({ message: '出発地を入力してください', error: '出発地がありません' });
+  }
 
   const body = JSON.stringify({
     contents: [{
