@@ -1,12 +1,14 @@
 "use client";
 
-import InputForm from '@/components/InputForm';
+import InputForm from '@/components/organisms/InputForm';
 import { useState } from 'react';
 
 export default function Home() {
   const [plan, setPlan] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePlanSubmit = async (formData: any) => {
+    setIsLoading(true);
     try {
       const response = await fetch('/api/plan', {
         method: 'POST',
@@ -24,13 +26,16 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-4xl font-bold mb-4">Random Trip Planner</h1>
-      <InputForm onSubmit={handlePlanSubmit} />
+      <InputForm onSubmit={handlePlanSubmit} isLoading={isLoading} />
+      {isLoading && <p>プランを作成中です...</p>}
       {plan && (
         <div className="mt-8 p-4 border rounded-md">
           <h2 className="text-2xl font-bold mb-2">提案プラン</h2>
