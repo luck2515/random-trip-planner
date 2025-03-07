@@ -1,0 +1,89 @@
+name: Random Trip Planner Development
+description: ランダムな旅行プランを提案するアプリケーションの開発プロジェクト
+
+columns:
+  - name: To Do
+    description: 未着手のタスク
+    type: automated
+    rules:
+      - if: issue.created
+        set: To Do
+
+  - name: In Progress
+    description: 作業中のタスク
+    type: automated
+    rules:
+      - if: issue.assignee !== null
+        set: In Progress
+
+  - name: Review
+    description: レビュー待ちのタスク
+    type: automated
+    rules:
+      - if: issue.labels.includes('review-required')
+        set: Review
+
+  - name: Done
+    description: 完了したタスク
+    type: automated
+    rules:
+      - if: issue.closed
+        set: Done
+
+labels:
+  - name: priority-p0
+    color: FF0000
+    description: 即時対応（1-2週間）
+
+  - name: priority-p1
+    color: FFA500
+    description: 短期対応（1-2ヶ月）
+
+  - name: priority-p2
+    color: FFFF00
+    description: 中期対応（3-6ヶ月）
+
+  - name: priority-p3
+    color: 00FF00
+    description: 長期対応（6ヶ月以上）
+
+  - name: type-bug
+    color: d73a4a
+    description: バグ修正
+
+  - name: type-feature
+    color: 0075ca
+    description: 新機能
+
+  - name: type-enhancement
+    color: a2eeef
+    description: 機能改善
+
+  - name: type-ui
+    color: 7057ff
+    description: UI/UX改善
+
+  - name: type-performance
+    color: 006b75
+    description: パフォーマンス改善
+
+  - name: review-required
+    color: fbca04
+    description: レビュー待ち
+
+milestones:
+  - title: 2025 Q2
+    description: P0項目（即時対応）
+    due_date: 2025-06-30
+
+  - title: 2025 Q3
+    description: P1項目（短期対応）
+    due_date: 2025-09-30
+
+  - title: 2025 Q4
+    description: P2項目（中期対応）
+    due_date: 2025-12-31
+
+  - title: 2026 Q1-Q2
+    description: P3項目（長期対応）
+    due_date: 2026-06-30

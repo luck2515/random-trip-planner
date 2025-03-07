@@ -5,6 +5,7 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { z } from "zod";
 import Modal from '@/components/atoms/Modal';
+import ErrorMessage from '@/components/atoms/ErrorMessage';
 
 interface PlanCandidate {
   content: {
@@ -35,6 +36,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState<{ title?: string; message: string } | null>(null);
 
   const handlePlanSubmit = async (formData: FormData | null) => {
     if (!formData) return;
@@ -42,6 +44,7 @@ export default function Home() {
     setIsLoading(true);
     setIsModalOpen(false);
     setFormData(formData);
+    setError(null);
     try {
       const schema = z.object({
         departure: z.string().min(1, { message: "出発地を入力してください" }),
@@ -65,14 +68,24 @@ export default function Home() {
         setPlan(data);
         setIsModalOpen(true);
       } else {
-        console.error('Error:', response.status);
+        const errorData = await response.json();
+        setError({
+          title: 'プランの作成に失敗しました',
+          message: errorData.message || 'エラーが発生しました。しばらく時間をおいて再度お試しください。'
+        });
       }
     } catch (error: unknown) {
       if (error instanceof z.ZodError) {
-        const errorMessage = error.errors.map((e) => e.message).join(', ');
-        console.error('バリデーションエラー:', errorMessage);
-        alert(JSON.stringify({ message: errorMessage, error: "出発地がありません" }));
+        const errorMessage = error.errors.map((e) => e.message).join('\n');
+        setError({
+          title: '入力内容にエラーがあります',
+          message: errorMessage
+        });
       } else {
+        setError({
+          title: '予期せぬエラーが発生しました',
+          message: '通信環境をご確認の上、しばらく時間をおいて再度お試しください。'
+        });
         console.error('Error:', error);
       }
     } finally {
@@ -89,8 +102,15 @@ const spotName = planText.split('\n')[0] || "";
 const departure = formData?.departure || "";
 
   return (
-    <div className="flex flex-col items-center justify-center p-8">
+    <div className="flex flex-col items-center justify-center p-8 max-w-4xl mx-auto">
       <h1 className="text-4xl font-bold mb-8">Random Trip Planner</h1>
+      {error && (
+        <ErrorMessage
+          title={error.title}
+          message={error.message}
+          onClose={() => setError(null)}
+        />
+      )}
       <InputForm onSubmit={handlePlanSubmit} isLoading={isLoading} />
       {isLoading && <p className="mt-4">プランを作成中です...</p>}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>

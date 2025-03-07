@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Random Trip Planner
 
-## Getting Started
+ランダムな旅行プランを提案するアプリケーション
 
-First, run the development server:
+## 開発ロードマップ
+
+開発計画は以下のファイルで管理されています：
+
+- `ROADMAP.md`: 全体的な開発計画と優先度
+- `.github/ISSUES.md`: Issue作成用のテンプレート
+- `.github/project.yml`: プロジェクトボードの設定
+
+## プロジェクト管理
+
+### 優先度レベル
+
+- `P0`: 即時対応（1-2週間）
+- `P1`: 短期対応（1-2ヶ月）
+- `P2`: 中期対応（3-6ヶ月）
+- `P3`: 長期対応（6ヶ月以上）
+
+### Issue作成手順
+
+1. `.github/ISSUES.md`のテンプレートを参照
+2. 適切な優先度とタイプのラベルを付与
+3. マイルストーンを設定
+4. 具体的なタスクリストを作成
+5. 影響範囲を明記
+
+### マイルストーン
+
+- 2025 Q2: P0項目（即時対応）
+- 2025 Q3: P1項目（短期対応）
+- 2025 Q4: P2項目（中期対応）
+- 2026 Q1-Q2: P3項目（長期対応）
+
+### レビュープロセス
+
+1. 実装完了後、`review-required`ラベルを付与
+2. レビュー後、承認されたらマージ
+3. issueをクローズ
+
+### プライバシーポリシー
+
+- ユーザー情報の収集・保存は行わない
+- カレンダーや予約システムとの連携は行わない
+- 外部サービスとの連携は必要最小限に留める
+
+## 開発環境
+
+- Node.js v20.x
+- React + Next.js
+- TypeScript
+- TailwindCSS
+
+## セットアップ
 
 ```bash
-npm run dev
-# or
+# パッケージのインストール
+yarn install
+
+# 開発サーバーの起動
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# ビルド
+yarn build
+
+# 本番サーバーの起動
+yarn start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 環境変数
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`.env.local`ファイルを作成し、以下の環境変数を設定してください：
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+GOOGLE_GEMINI_API_KEY=your_api_key_here
+```
 
-## Learn More
+## コントリビューション
 
-To learn more about Next.js, take a look at the following resources:
+1. [ROADMAP.md](./ROADMAP.md)を確認
+2. [ISSUES.md](./.github/ISSUES.md)のテンプレートに従ってissueを作成
+3. ブランチを作成（`feature/`, `fix/`, `docs/`などのプレフィックスを使用）
+4. 変更を実装
+5. プルリクエストを作成
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ライセンス
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

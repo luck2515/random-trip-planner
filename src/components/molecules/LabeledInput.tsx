@@ -7,7 +7,7 @@ interface LabeledInputProps {
   label: string;
   placeholder?: string;
   register: UseFormRegisterReturn;
-  errors?: any;
+  errors?: string | undefined;
 }
 
 const LabeledInput: React.FC<LabeledInputProps> = ({ label, placeholder, register, errors }) => {
