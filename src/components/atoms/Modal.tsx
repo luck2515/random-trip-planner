@@ -6,9 +6,10 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  className?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, className }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -21,7 +22,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto relative"
+            className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-11/12 max-h-[90vh] overflow-y-auto relative ${className || 'max-w-2xl'}`}
           >
             {/* 閉じるボタン */}
             <button
