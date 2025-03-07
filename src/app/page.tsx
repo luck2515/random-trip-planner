@@ -67,7 +67,7 @@ export default function Home() {
       const validatedData = schema.parse(formData);
 
       const response = await apiClient.post<PlanResponse>('/api/plan', validatedData, {
-        onRetry: (retryCount, error) => {
+        onRetry: (retryCount) => {
           setRetryState({
             count: retryCount,
             maxRetries: 2,
