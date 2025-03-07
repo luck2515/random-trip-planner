@@ -7,7 +7,7 @@ interface LabeledSelectProps {
   label: string;
   children: React.ReactNode;
   register: UseFormRegisterReturn;
-  errors?: any;
+  errors?: string | undefined;
   className?: string;
 }
 
@@ -16,7 +16,7 @@ const LabeledSelect: React.FC<LabeledSelectProps> = ({ label, children, register
     <div className={className}>
       <Label htmlFor={register.name}>{label}</Label>
       <Select register={register}>{children}</Select>
-      {errors && <p className="text-red-500 text-xs italic">{errors.message}</p>}
+      {typeof errors === 'string' && <p className="text-red-500 text-xs italic">{errors}</p>}
     </div>
   );
 };
