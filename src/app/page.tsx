@@ -6,6 +6,14 @@ import ReactMarkdown from 'react-markdown';
 import { z } from "zod";
 import Modal from '@/components/atoms/Modal';
 import ErrorMessage from '@/components/atoms/ErrorMessage';
+import RetryProgress from '@/components/atoms/RetryProgress';
+import { apiClient } from '@/utils/api';
+
+interface RetryState {
+  count: number;
+  maxRetries: number;
+  nextRetryIn?: number;
+}
 
 interface PlanCandidate {
   content: {
@@ -37,6 +45,7 @@ export default function Home() {
   const [formData, setFormData] = useState<FormData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<{ title?: string; message: string } | null>(null);
+  const [retryState, setRetryState] = useState<RetryState | null>(null);
 
   const handlePlanSubmit = async (formData: FormData | null) => {
     if (!formData) return;
@@ -44,6 +53,8 @@ export default function Home() {
     setIsLoading(true);
     setIsModalOpen(false);
     setFormData(formData);
+    setError(null);
+    setRetryState(null);
     setError(null);
     try {
       const schema = z.object({
@@ -55,24 +66,27 @@ export default function Home() {
       });
       const validatedData = schema.parse(formData);
 
-      const response = await fetch('/api/plan', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(validatedData),
+      const response = await apiClient.post<PlanResponse>('/api/plan', validatedData, {
+        onRetry: (retryCount, error) => {
+          setRetryState({
+            count: retryCount,
+            maxRetries: 2,
+            nextRetryIn: 1000 * Math.pow(2, retryCount - 1)
+          });
+        }
       });
 
-      if (response.ok) {
-        const data = await response.json() as PlanResponse;
-        setPlan(data);
-        setIsModalOpen(true);
-      } else {
-        const errorData = await response.json();
+      if (response.error) {
         setError({
           title: 'プランの作成に失敗しました',
-          message: errorData.message || 'エラーが発生しました。しばらく時間をおいて再度お試しください。'
+          message: response.error.message
         });
+        return;
+      }
+
+      if (response.data) {
+        setPlan(response.data);
+        setIsModalOpen(true);
       }
     } catch (error: unknown) {
       if (error instanceof z.ZodError) {
@@ -112,7 +126,18 @@ const departure = formData?.departure || "";
         />
       )}
       <InputForm onSubmit={handlePlanSubmit} isLoading={isLoading} />
-      {isLoading && <p className="mt-4">プランを作成中です...</p>}
+      {isLoading && (
+        <div className="mt-4">
+          <p>プランを作成中です...</p>
+          {retryState && (
+            <RetryProgress
+              retryCount={retryState.count}
+              maxRetries={retryState.maxRetries}
+              nextRetryIn={retryState.nextRetryIn}
+            />
+          )}
+        </div>
+      )}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         {plan?.plan?.candidates?.[0]?.content?.parts?.[0]?.text && (
           <div className="mt-8 p-4 border rounded-md w-full">
