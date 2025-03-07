@@ -67,7 +67,7 @@ export default function Home() {
       const validatedData = schema.parse(formData);
 
       const response = await apiClient.post<PlanResponse>('/api/plan', validatedData, {
-        onRetry: (retryCount, error) => {
+        onRetry: (retryCount) => {
           setRetryState({
             count: retryCount,
             maxRetries: 2,
@@ -116,8 +116,8 @@ const spotName = planText.split('\n')[0] || "";
 const departure = formData?.departure || "";
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 max-w-4xl mx-auto">
-      <h1 className="text-4xl font-bold mb-8">Random Trip Planner</h1>
+    <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 max-w-4xl mx-auto min-h-screen">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 md:mb-8 text-center">Random Trip Planner</h1>
       {error && (
         <ErrorMessage
           title={error.title}

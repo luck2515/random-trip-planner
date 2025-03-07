@@ -22,18 +22,18 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, className }) =
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             onClick={(e) => e.stopPropagation()}
-            className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-11/12 max-h-[90vh] overflow-y-auto relative ${className || 'max-w-2xl'}`}
+            className={`bg-white dark:bg-gray-800 p-4 sm:p-6 md:p-8 rounded-lg shadow-xl w-[95%] sm:w-11/12 max-h-[90vh] overflow-y-auto relative ${className || 'max-w-2xl'}`}
           >
             {/* 閉じるボタン */}
             <button
               onClick={onClose}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <X size={24} />
             </button>
 
             {/* コンテンツ */}
-            <div className="text-gray-800 dark:text-gray-200">{children}</div>
+            <div className="text-gray-800 dark:text-gray-200 mt-4">{children}</div>
           </motion.div>
         </div>
       )}

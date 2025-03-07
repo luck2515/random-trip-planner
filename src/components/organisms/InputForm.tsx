@@ -44,7 +44,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
   });
 
   return (
-    <form className="flex flex-col gap-4 w-full max-w-md p-8" onSubmit={handleSubmit((data) => {
+    <form className="flex flex-col gap-4 w-full max-w-md p-4 sm:p-6 md:p-8" onSubmit={handleSubmit((data) => {
       onSubmit(data);
     })}>
       <LabeledInput label="出発地点" register={register('departure')} errors={errors.departure?.message} />
