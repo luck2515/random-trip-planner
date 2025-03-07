@@ -116,31 +116,40 @@ const spotName = planText.split('\n')[0] || "";
 const departure = formData?.departure || "";
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 max-w-4xl mx-auto min-h-screen">
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 md:mb-8 text-center">Random Trip Planner</h1>
-      {error && (
+    <div className="min-h-screen py-8 sm:py-12 flex flex-col items-center">
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 flex-1 flex flex-col">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-12 text-center print:text-4xl print:mb-8">Random Trip Planner</h1>
+        {error && (
         <ErrorMessage
           title={error.title}
           message={error.message}
           onClose={() => setError(null)}
         />
       )}
-      <InputForm onSubmit={handlePlanSubmit} isLoading={isLoading} />
-      {isLoading && (
-        <div className="mt-4">
-          <p>プランを作成中です...</p>
-          {retryState && (
-            <RetryProgress
-              retryCount={retryState.count}
-              maxRetries={retryState.maxRetries}
-              nextRetryIn={retryState.nextRetryIn}
-            />
-          )}
+        <div className="flex flex-col items-center w-full">
+          <InputForm onSubmit={handlePlanSubmit} isLoading={isLoading} />
         </div>
-      )}
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-        {plan?.plan?.candidates?.[0]?.content?.parts?.[0]?.text && (
+        <Modal isOpen={isModalOpen || isLoading} onClose={handleCloseModal} className="print:!block print:!fixed print:!inset-0 print:!bg-white print:!p-0">
+        {isLoading ? (
           <div className="mt-8 p-4 border rounded-md w-full">
+            <h2 className="text-2xl font-bold mb-4">プランを作成中です...</h2>
+            {retryState && (
+              <RetryProgress
+                retryCount={retryState.count}
+                maxRetries={retryState.maxRetries}
+                nextRetryIn={retryState.nextRetryIn}
+              />
+            )}
+            <div className="space-y-4 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+              <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+            </div>
+          </div>
+        ) : plan?.plan?.candidates?.[0]?.content?.parts?.[0]?.text && (
+          <div className="mt-8 p-4 border rounded-md w-full print:border-none print:mt-0 print:p-8">
             <h2 className="text-2xl font-bold mb-2">提案プラン</h2>
             <div className="prose dark:prose-invert max-w-none">
               <ReactMarkdown
@@ -156,7 +165,7 @@ const departure = formData?.departure || "";
                 {plan.plan.candidates[0].content.parts[0].text}
               </ReactMarkdown>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-center print:hidden">
               <button
                 className="w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                 onClick={() => handlePlanSubmit(formData)}
@@ -174,7 +183,8 @@ const departure = formData?.departure || "";
             </div>
           </div>
         )}
-      </Modal>
+        </Modal>
+      </div>
     </div>
   );
 }
