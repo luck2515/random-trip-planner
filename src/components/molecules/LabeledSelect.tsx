@@ -1,58 +1,61 @@
 import React from 'react';
+import { UseFormRegisterReturn } from 'react-hook-form';
 import Label from '@/components/atoms/Label';
 import Select from '@/components/atoms/Select';
-import { UseFormRegisterReturn } from 'react-hook-form';
 
-interface LabeledSelectProps {
+interface Option {
+  value: string;
   label: string;
-  children: React.ReactNode;
-  register: UseFormRegisterReturn;
-  errors?: string | undefined;
-  className?: string;
-  description?: string;
-  required?: boolean;
 }
 
-const LabeledSelect: React.FC<LabeledSelectProps> = ({ 
-  label, 
-  children, 
-  register, 
-  errors, 
-  className,
+interface LabeledSelectProps {
+  id: string;
+  label: string;
+  options: Option[];
+  register: UseFormRegisterReturn;
+  required?: boolean;
+  errors?: string;
+  description?: string;
+}
+
+const LabeledSelect: React.FC<LabeledSelectProps> = ({
+  id,
+  label,
+  options,
+  register,
+  required,
+  errors,
   description,
-  required 
 }) => {
-  const descriptionId = description ? `${register.name}-description` : undefined;
-  const errorId = errors ? `${register.name}-error` : undefined;
+  const descriptionId = description ? `${id}-description` : undefined;
 
   return (
-    <div className={className}>
-      <Label htmlFor={register.name} required={required}>{label}</Label>
+    <div className="mb-4">
+      <Label
+        htmlFor={id}
+        required={required}
+        className="text-gray-900 dark:text-dark-text-primary"
+      >
+        {label}
+      </Label>
       {description && (
-        <p 
-          id={descriptionId} 
-          className="text-sm text-gray-600 mt-1 mb-2"
+        <p
+          id={descriptionId}
+          className="mt-1 text-sm text-gray-600 dark:text-dark-text-secondary"
         >
           {description}
         </p>
       )}
-      <Select 
-        register={register} 
-        aria-describedby={`${descriptionId || ''} ${errorId || ''}`}
-        aria-required={required}
-        aria-invalid={errors ? 'true' : 'false'}
-      >
-        {children}
-      </Select>
-      {typeof errors === 'string' && (
-        <p 
-          id={errorId}
-          className="text-red-500 text-xs italic" 
-          role="alert"
-        >
-          {errors}
-        </p>
-      )}
+      <div className="mt-2">
+        <Select
+          id={id}
+          options={options}
+          register={register}
+          errors={errors}
+          required={required}
+          aria-describedby={descriptionId}
+        />
+      </div>
     </div>
   );
 };

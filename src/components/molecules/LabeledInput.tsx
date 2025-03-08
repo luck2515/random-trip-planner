@@ -1,51 +1,59 @@
 import React from 'react';
+import { UseFormRegisterReturn } from 'react-hook-form';
 import Label from '@/components/atoms/Label';
 import Input from '@/components/atoms/Input';
-import { UseFormRegisterReturn } from 'react-hook-form';
 
 interface LabeledInputProps {
+  id: string;
   label: string;
+  type?: 'text' | 'email' | 'tel' | 'number';
   placeholder?: string;
   register: UseFormRegisterReturn;
-  errors?: string | undefined;
-  type?: 'text' | 'email' | 'tel' | 'number';
   required?: boolean;
+  errors?: string;
   description?: string;
 }
 
 const LabeledInput: React.FC<LabeledInputProps> = ({
+  id,
   label,
+  type = 'text',
   placeholder,
   register,
+  required,
   errors,
-  type = 'text',
-  required = false,
-  description
+  description,
 }) => {
-  const inputId = `${register.name}-input`;
-  const labelId = `${register.name}-label`;
-  const descriptionId = description ? `${register.name}-description` : undefined;
+  const descriptionId = description ? `${id}-description` : undefined;
 
   return (
-    <div role="group" aria-labelledby={labelId}>
-      <Label htmlFor={inputId} id={labelId}>
+    <div className="mb-4">
+      <Label
+        htmlFor={id}
+        required={required}
+        className="text-gray-900 dark:text-dark-text-primary"
+      >
         {label}
-        {required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
       </Label>
       {description && (
-        <p id={descriptionId} className="text-sm text-gray-600 mt-1 mb-2">
+        <p
+          id={descriptionId}
+          className="mt-1 text-sm text-gray-600 dark:text-dark-text-secondary"
+        >
           {description}
         </p>
       )}
-      <Input
-        type={type}
-        id={inputId}
-        placeholder={placeholder}
-        register={register}
-        errors={errors}
-        required={required}
-        aria-describedby={descriptionId}
-      />
+      <div className="mt-2">
+        <Input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          register={register}
+          errors={errors}
+          required={required}
+          aria-describedby={descriptionId}
+        />
+      </div>
     </div>
   );
 };

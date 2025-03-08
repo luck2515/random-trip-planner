@@ -1,145 +1,114 @@
-"use client";
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { z } from 'zod';
+import Button from '@/components/atoms/Button';
 import LabeledInput from '@/components/molecules/LabeledInput';
 import LabeledSelect from '@/components/molecules/LabeledSelect';
-import Button from '@/components/atoms/Button';
 
-interface InputFormProps {
-  /**
-   * フォーム送信時の処理
-   */
-  onSubmit: (formData: FormData) => Promise<void>;
-  /**
-   * ローディング状態
-   */
-  isLoading: boolean;
-}
-
-/**
- * フォームのスキーマ
- */
 const schema = z.object({
-  departure: z.string().min(1, { message: "出発地点を入力してください" }),
-  time: z.string().optional(),
-  transport: z.string().optional(),
-  mood: z.string().optional(),
+  departure: z.string().min(1, '出発地を入力してください'),
+  time: z.string().min(1, '所要時間を選択してください'),
+  transport: z.string(),
+  mood: z.string(),
   customTime: z.string().optional(),
 });
 
-type FormData = z.infer<typeof schema>;
+type FormInputs = z.infer<typeof schema>;
 
-/**
- * 入力フォームコンポーネント
- */
+interface InputFormProps {
+  onSubmit: (data: FormInputs) => void;
+  isLoading?: boolean;
+}
+
+const timeOptions = [
+  { value: '2', label: '2時間' },
+  { value: '4', label: '4時間' },
+  { value: '6', label: '6時間' },
+  { value: '8', label: '8時間' },
+  { value: 'custom', label: 'カスタム' },
+];
+
+const transportOptions = [
+  { value: 'all', label: '指定なし' },
+  { value: 'walk', label: '徒歩メイン' },
+  { value: 'public', label: '公共交通機関' },
+  { value: 'car', label: '車' },
+];
+
+const moodOptions = [
+  { value: 'all', label: '指定なし' },
+  { value: 'active', label: 'アクティブに' },
+  { value: 'relaxed', label: 'ゆっくり' },
+  { value: 'cultural', label: '文化的に' },
+];
+
 const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
-  /**
-   * react-hook-formのuseForm
-   */
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormInputs>({
     resolver: zodResolver(schema),
   });
 
+  const selectedTime = watch('time');
+
   return (
-    <form 
-      className="flex flex-col gap-4 w-full max-w-md p-4 sm:p-6 md:p-8" 
-      onSubmit={handleSubmit((data) => {
-        onSubmit(data);
-      })}
-      role="form"
-      aria-labelledby="form-title"
-      noValidate
-    >
-      <h2 id="form-title" className="sr-only">旅行プラン作成フォーム</h2>
-      
-      <LabeledInput 
-        label="出発地点" 
-        register={register('departure')} 
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <LabeledInput
+        id="departure"
+        label="出発地"
+        register={register('departure')}
         errors={errors.departure?.message}
         required
-        description="あなたの現在地や出発したい場所を入力してください"
+        description="最寄り駅や地域名を入力してください"
       />
 
-      {/* 時間設定グループ */}
-      <div 
-        role="group" 
-        aria-labelledby="time-group-label"
-      >
-        <div id="time-group-label" className="sr-only">所要時間設定</div>
-        <LabeledSelect 
-          label="時間" 
-          register={register('time')} 
-          errors={errors.time?.message} 
-          className="mb-4"
-          description="希望する所要時間を選択してください"
-        >
-          <option value="">選択してください</option>
-          <option value="30">30分以内</option>
-          <option value="60">1時間以内</option>
-          <option value="180">3時間以内</option>
-          <option value="480">半日</option>
-          <option value="1440">終日</option>
-          <option value="custom">自由入力</option>
-        </LabeledSelect>
-        {watch('time') === 'custom' && (
-          <LabeledInput 
-            label="時間（分）" 
-            register={register('customTime')} 
-            description="希望する所要時間を分単位で入力してください"
-          />
-        )}
-      </div>
+      <LabeledSelect
+        id="time"
+        label="所要時間"
+        options={timeOptions}
+        register={register('time')}
+        errors={errors.time?.message}
+        description="希望する観光時間を選択してください"
+      />
 
-      <LabeledSelect 
-        label="移動手段" 
-        register={register('transport')} 
-        className="mb-4"
-        description="希望する移動手段を選択してください"
-      >
-        <option value="徒歩">徒歩</option>
-        <option value="自転車">自転車</option>
-        <option value="電車">電車</option>
-        <option value="バス">バス</option>
-        <option value="車">車</option>
-      </LabeledSelect>
-
-      <LabeledSelect label="過ごし方" register={register('mood')} className="mb-4">
-        <option value="">選択してください</option>
-        <option value="のんびり">のんびり</option>
-        <option value="アクティブ">アクティブ</option>
-        <option value="癒し">癒し</option>
-        <option value="観光">観光</option>
-        <option value="グルメ">グルメ</option>
-        <option value="ショッピング">ショッピング</option>
-        <option value="温泉">温泉</option>
-        <option value="自然">自然</option>
-        <option value="歴史">歴史</option>
-        <option value="アート">アート</option>
-      </LabeledSelect>
-
-      <Button 
-        type="submit"
-        disabled={isLoading} 
-        className="disabled:opacity-50 disabled:cursor-not-allowed mt-4 w-full"
-        aria-label={isLoading ? "プラン作成中..." : "プランを提案"}
-        aria-busy={isLoading}
-      >
-        {isLoading ? "作成中..." : "プランを提案"}
-      </Button>
-
-      {/* 全体のバリデーションエラー表示 */}
-      {Object.keys(errors).length > 0 && (
-        <div 
-          role="alert" 
-          className="text-red-500 text-sm mt-4"
-          aria-live="polite"
-        >
-          入力内容に問題があります。各項目のエラーメッセージを確認してください。
-        </div>
+      {selectedTime === 'custom' && (
+        <LabeledInput
+          id="customTime"
+          label="カスタム時間"
+          type="number"
+          register={register('customTime')}
+          description="希望する時間（時間単位）を入力してください"
+        />
       )}
+
+      <LabeledSelect
+        id="transport"
+        label="移動手段"
+        options={transportOptions}
+        register={register('transport')}
+        description="希望する主な移動手段を選択してください"
+      />
+
+      <LabeledSelect
+        id="mood"
+        label="過ごし方"
+        options={moodOptions}
+        register={register('mood')}
+      />
+
+      <div className="flex justify-center">
+        <Button
+          type="submit"
+          isLoading={isLoading}
+          className="w-full sm:w-auto"
+        >
+          プランを生成
+        </Button>
+      </div>
     </form>
   );
 };
