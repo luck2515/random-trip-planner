@@ -117,7 +117,19 @@ const departure = formData?.departure || "";
 
   return (
     <div className="min-h-screen py-8 sm:py-12 flex flex-col items-center">
-      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 flex-1 flex flex-col">
+      {/* スキップリンク */}
+      <a 
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white text-blue-600 p-2 rounded shadow"
+      >
+        メインコンテンツへスキップ
+      </a>
+
+      <main
+        id="main-content"
+        className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 flex-1 flex flex-col"
+        role="main"
+      >
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-12 text-center print:text-4xl print:mb-8">Random Trip Planner</h1>
         {error && (
         <ErrorMessage
@@ -129,10 +141,20 @@ const departure = formData?.departure || "";
         <div className="flex flex-col items-center w-full">
           <InputForm onSubmit={handlePlanSubmit} isLoading={isLoading} />
         </div>
-        <Modal isOpen={isModalOpen || isLoading} onClose={handleCloseModal} className="print:!block print:!fixed print:!inset-0 print:!bg-white print:!p-0">
+        <Modal 
+          isOpen={isModalOpen || isLoading} 
+          onClose={handleCloseModal} 
+          className="print:!block print:!fixed print:!inset-0 print:!bg-white print:!p-0"
+          title={isLoading ? "プラン作成中" : "提案プラン"}
+          description={isLoading ? "AIがあなたに合わせた旅行プランを作成しています" : undefined}
+        >
         {isLoading ? (
-          <div className="mt-8 p-4 border rounded-md w-full">
-            <h2 className="text-2xl font-bold mb-4">プランを作成中です...</h2>
+          <div 
+            className="mt-8 p-4 border rounded-md w-full"
+            role="status"
+            aria-live="polite"
+          >
+            <h2 className="text-2xl font-bold mb-4" id="loading-status">プランを作成中です...</h2>
             {retryState && (
               <RetryProgress
                 retryCount={retryState.count}
@@ -149,8 +171,12 @@ const departure = formData?.departure || "";
             </div>
           </div>
         ) : plan?.plan?.candidates?.[0]?.content?.parts?.[0]?.text && (
-          <div className="mt-8 p-4 border rounded-md w-full print:border-none print:mt-0 print:p-8">
-            <h2 className="text-2xl font-bold mb-2">提案プラン</h2>
+          <div 
+            className="mt-8 p-4 border rounded-md w-full print:border-none print:mt-0 print:p-8"
+            role="article"
+            aria-labelledby="plan-title"
+          >
+            <h2 id="plan-title" className="text-2xl font-bold mb-2">提案プラン</h2>
             <div className="prose dark:prose-invert max-w-none">
               <ReactMarkdown
                 components={{
@@ -170,6 +196,8 @@ const departure = formData?.departure || "";
                 className="w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                 onClick={() => handlePlanSubmit(formData)}
                 disabled={isLoading || !formData}
+                aria-label="新しい旅行プランを生成"
+                aria-busy={isLoading}
               >
                 別のプランを提案
               </button>
@@ -177,6 +205,7 @@ const departure = formData?.departure || "";
                 className="w-full sm:w-auto bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                 onClick={() => window.open(`https://www.google.com/maps/dir/${encodeURIComponent(departure)}/${encodeURIComponent(spotName)}`, '_blank')}
                 disabled={isLoading || !spotName.trim() || !departure.trim()}
+                aria-label={`${departure}から${spotName}までの経路を地図で表示`}
               >
                 地図で見る
               </button>
@@ -184,7 +213,7 @@ const departure = formData?.departure || "";
           </div>
         )}
         </Modal>
-      </div>
+      </main>
     </div>
   );
 }
